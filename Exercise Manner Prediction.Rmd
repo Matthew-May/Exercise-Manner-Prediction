@@ -10,7 +10,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ## abstract
-This report provides an prediction model based on the data from accelerometers on the belt, forearm, arm, and dumbell of 6 participants. It's goal is to predict the manner in which they did the exercise. I use random forest as the model for this task. I also use cross validation during trainning.
+This report provides an prediction model based on the data from accelerometers on the belt, forearm, arm, and dumbell of 6 participants. It's goal is to predict the manner in which they did the exercise. I use random forest as the model for this task. I also use cross validation during trainning. The accuracy is 99.56%.
 
 ## clean the data
 Since there are many NA in the data, I have to clean the data first  
