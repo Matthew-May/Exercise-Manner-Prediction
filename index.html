@@ -127,13 +127,15 @@ $(document).ready(function () {
 
 <div id="abstract" class="section level2">
 <h2>abstract</h2>
-<p>This report provides an prediction model based on the data from accelerometers on the belt, forearm, arm, and dumbell of 6 participants. It’s goal is to predict the manner in which they did the exercise. I use random forest as the model for this task. I also use cross validation during trainning.</p>
+<p>This report provides an prediction model based on the data from accelerometers on the belt, forearm, arm, and dumbell of 6 participants. It’s goal is to predict the manner in which they did the exercise. I use random forest as the model for this task. I also use cross validation during trainning. The accuracy is 99.56%.</p>
 </div>
 <div id="clean-the-data" class="section level2">
 <h2>clean the data</h2>
 <p>Since there are many NA in the data, I have to clean the data first</p>
-<p>data &lt;- read.csv(“pml-training.csv”)</p>
-<p>data &lt;- data[,c(“roll_belt”,“pitch_belt”,“yaw_belt”,“total_accel_belt”,“gyros_belt_x”,“gyros_belt_y”,“gyros_belt_z”,“accel_belt_x”,“accel_belt_y”,“accel_belt_z”,“magnet_belt_x”,“magnet_belt_y”,“magnet_belt_z”,“roll_arm”,“pitch_arm”,“yaw_arm”,“gyros_arm_x”,“gyros_arm_y”,“gyros_arm_z”,“accel_arm_x”,“accel_arm_y”,“accel_arm_z”,“magnet_arm_x”,“magnet_arm_y”,“magnet_arm_z”,“roll_dumbbell”,“pitch_dumbbell”,“yaw_dumbbell”,“gyros_dumbbell_x”,“gyros_dumbbell_y”,“gyros_dumbbell_z”,“accel_dumbbell_x”,“accel_dumbbell_y”,“accel_dumbbell_z”,“magnet_dumbbell_x”,“magnet_dumbbell_y”,“magnet_dumbbell_z”,“roll_forearm”,“pitch_forearm”,“yaw_forearm”,“total_accel_forearm”,“gyros_forearm_x”,“gyros_forearm_y”,“gyros_forearm_z”,“accel_forearm_x”,“accel_forearm_y”,“accel_forearm_z”,“magnet_forearm_x”,“magnet_forearm_y”,“magnet_forearm_z”,“classe”)]</p>
+<pre class="r"><code>set.seed(1)
+
+data &lt;- read.csv(&quot;D:\\coursera\\8Machine learning\\week4\\Peer-graded Assignment Prediction Assignment Writeup\\pml-training.csv&quot;)
+data &lt;- data[,c(&quot;roll_belt&quot;,&quot;pitch_belt&quot;,&quot;yaw_belt&quot;,&quot;total_accel_belt&quot;,&quot;gyros_belt_x&quot;,&quot;gyros_belt_y&quot;,&quot;gyros_belt_z&quot;,&quot;accel_belt_x&quot;,&quot;accel_belt_y&quot;,&quot;accel_belt_z&quot;,&quot;magnet_belt_x&quot;,&quot;magnet_belt_y&quot;,&quot;magnet_belt_z&quot;,&quot;roll_arm&quot;,&quot;pitch_arm&quot;,&quot;yaw_arm&quot;,&quot;gyros_arm_x&quot;,&quot;gyros_arm_y&quot;,&quot;gyros_arm_z&quot;,&quot;accel_arm_x&quot;,&quot;accel_arm_y&quot;,&quot;accel_arm_z&quot;,&quot;magnet_arm_x&quot;,&quot;magnet_arm_y&quot;,&quot;magnet_arm_z&quot;,&quot;roll_dumbbell&quot;,&quot;pitch_dumbbell&quot;,&quot;yaw_dumbbell&quot;,&quot;gyros_dumbbell_x&quot;,&quot;gyros_dumbbell_y&quot;,&quot;gyros_dumbbell_z&quot;,&quot;accel_dumbbell_x&quot;,&quot;accel_dumbbell_y&quot;,&quot;accel_dumbbell_z&quot;,&quot;magnet_dumbbell_x&quot;,&quot;magnet_dumbbell_y&quot;,&quot;magnet_dumbbell_z&quot;,&quot;roll_forearm&quot;,&quot;pitch_forearm&quot;,&quot;yaw_forearm&quot;,&quot;total_accel_forearm&quot;,&quot;gyros_forearm_x&quot;,&quot;gyros_forearm_y&quot;,&quot;gyros_forearm_z&quot;,&quot;accel_forearm_x&quot;,&quot;accel_forearm_y&quot;,&quot;accel_forearm_z&quot;,&quot;magnet_forearm_x&quot;,&quot;magnet_forearm_y&quot;,&quot;magnet_forearm_z&quot;,&quot;classe&quot;)]</code></pre>
 </div>
 <div id="build-model" class="section level2">
 <h2>build model</h2>
@@ -142,27 +144,83 @@ $(document).ready(function () {
 <li>I create the trainControl object to do the cross-validation with 5 folds</li>
 <li>I have tried several different models and random forest is proved to be the best, so I use random forest here.</li>
 </ul>
-<p>library(“caret”)<br />
-inTrain &lt;- createDataPartition(data$classe,p=0.7,list=FALSE)</p>
-<p>training &lt;- data[inTrain,]<br />
-testing &lt;- data[-inTrain,]</p>
-<p>library(parallel)<br />
-library(doParallel)<br />
-cluster &lt;- makeCluster(detectCores() - 1) # convention to leave 1 core for OS<br />
-registerDoParallel(cluster)</p>
-<p>fitControl &lt;- trainControl(method = “cv”,<br />
-number = 5,<br />
-allowParallel = TRUE)</p>
-<p>fit &lt;- train(classe ~ .,method=“rf”,training,trControl=fitControl)</p>
-<p>stopCluster(cluster)<br />
-registerDoSEQ()</p>
+<pre class="r"><code>library(&quot;caret&quot;)</code></pre>
+<pre><code>## Warning: package 'caret' was built under R version 3.4.3</code></pre>
+<pre><code>## Loading required package: lattice</code></pre>
+<pre><code>## Loading required package: ggplot2</code></pre>
+<pre><code>## Warning: package 'ggplot2' was built under R version 3.4.3</code></pre>
+<pre class="r"><code>inTrain &lt;- createDataPartition(data$classe,p=0.7,list=FALSE)
+
+training &lt;- data[inTrain,]
+testing &lt;- data[-inTrain,]
+
+
+# training----------------------------------------------------------------------
+library(parallel)
+library(doParallel)</code></pre>
+<pre><code>## Warning: package 'doParallel' was built under R version 3.4.3</code></pre>
+<pre><code>## Loading required package: foreach</code></pre>
+<pre><code>## Warning: package 'foreach' was built under R version 3.4.3</code></pre>
+<pre><code>## Loading required package: iterators</code></pre>
+<pre><code>## Warning: package 'iterators' was built under R version 3.4.3</code></pre>
+<pre class="r"><code>cluster &lt;- makeCluster(detectCores() - 1) # convention to leave 1 core for OS
+registerDoParallel(cluster)
+
+fitControl &lt;- trainControl(method = &quot;cv&quot;,
+                           number = 5,
+                           allowParallel = TRUE)
+
+
+fit &lt;- train(classe ~ .,method=&quot;rf&quot;,training,trControl=fitControl)
+
+stopCluster(cluster)
+registerDoSEQ()</code></pre>
 </div>
 <div id="testing-and-out-of-sample-error" class="section level2">
 <h2>testing and out of sample error</h2>
 <p>For discrete data, we use ‘accuracy’ to measure the performance.<br />
 The test shows that the accuracy is 0.995582</p>
-<p>p &lt;- predict(fit,testing)</p>
-<p>a &lt;- confusionMatrix(p,testing<span class="math inline">\(classe)\)</span>overall[1]</p>
+<pre class="r"><code>p &lt;- predict(fit,testing)
+
+# Accuracy : 0.9956
+confusionMatrix(p,testing$classe)</code></pre>
+<pre><code>## Confusion Matrix and Statistics
+## 
+##           Reference
+## Prediction    A    B    C    D    E
+##          A 1671    2    0    0    0
+##          B    0 1137    7    0    0
+##          C    2    0 1018    9    1
+##          D    0    0    1  954    2
+##          E    1    0    0    1 1079
+## 
+## Overall Statistics
+##                                           
+##                Accuracy : 0.9956          
+##                  95% CI : (0.9935, 0.9971)
+##     No Information Rate : 0.2845          
+##     P-Value [Acc &gt; NIR] : &lt; 2.2e-16       
+##                                           
+##                   Kappa : 0.9944          
+##  Mcnemar's Test P-Value : NA              
+## 
+## Statistics by Class:
+## 
+##                      Class: A Class: B Class: C Class: D Class: E
+## Sensitivity            0.9982   0.9982   0.9922   0.9896   0.9972
+## Specificity            0.9995   0.9985   0.9975   0.9994   0.9996
+## Pos Pred Value         0.9988   0.9939   0.9883   0.9969   0.9981
+## Neg Pred Value         0.9993   0.9996   0.9984   0.9980   0.9994
+## Prevalence             0.2845   0.1935   0.1743   0.1638   0.1839
+## Detection Rate         0.2839   0.1932   0.1730   0.1621   0.1833
+## Detection Prevalence   0.2843   0.1944   0.1750   0.1626   0.1837
+## Balanced Accuracy      0.9989   0.9984   0.9949   0.9945   0.9984</code></pre>
+</div>
+<div id="predict-on-the-test.csv" class="section level2">
+<h2>predict on the test.csv</h2>
+<pre class="r"><code>d_test &lt;- read.csv(&quot;D:\\coursera\\8Machine learning\\week4\\Peer-graded Assignment Prediction Assignment Writeup\\pml-testing.csv&quot;)
+d_test &lt;- d_test[,c(&quot;roll_belt&quot;,&quot;pitch_belt&quot;,&quot;yaw_belt&quot;,&quot;total_accel_belt&quot;,&quot;gyros_belt_x&quot;,&quot;gyros_belt_y&quot;,&quot;gyros_belt_z&quot;,&quot;accel_belt_x&quot;,&quot;accel_belt_y&quot;,&quot;accel_belt_z&quot;,&quot;magnet_belt_x&quot;,&quot;magnet_belt_y&quot;,&quot;magnet_belt_z&quot;,&quot;roll_arm&quot;,&quot;pitch_arm&quot;,&quot;yaw_arm&quot;,&quot;gyros_arm_x&quot;,&quot;gyros_arm_y&quot;,&quot;gyros_arm_z&quot;,&quot;accel_arm_x&quot;,&quot;accel_arm_y&quot;,&quot;accel_arm_z&quot;,&quot;magnet_arm_x&quot;,&quot;magnet_arm_y&quot;,&quot;magnet_arm_z&quot;,&quot;roll_dumbbell&quot;,&quot;pitch_dumbbell&quot;,&quot;yaw_dumbbell&quot;,&quot;gyros_dumbbell_x&quot;,&quot;gyros_dumbbell_y&quot;,&quot;gyros_dumbbell_z&quot;,&quot;accel_dumbbell_x&quot;,&quot;accel_dumbbell_y&quot;,&quot;accel_dumbbell_z&quot;,&quot;magnet_dumbbell_x&quot;,&quot;magnet_dumbbell_y&quot;,&quot;magnet_dumbbell_z&quot;,&quot;roll_forearm&quot;,&quot;pitch_forearm&quot;,&quot;yaw_forearm&quot;,&quot;total_accel_forearm&quot;,&quot;gyros_forearm_x&quot;,&quot;gyros_forearm_y&quot;,&quot;gyros_forearm_z&quot;,&quot;accel_forearm_x&quot;,&quot;accel_forearm_y&quot;,&quot;accel_forearm_z&quot;,&quot;magnet_forearm_x&quot;,&quot;magnet_forearm_y&quot;,&quot;magnet_forearm_z&quot;)]
+p &lt;- predict(fit,d_test)</code></pre>
 </div>
 
 
